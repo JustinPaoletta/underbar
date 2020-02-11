@@ -157,15 +157,17 @@
       
         }else{
           //Sort the array from lowest to highest (JP)
-          array.sort((a, b) => {return a - b});
+          let copyArr = array.slice(0);
+          copyArr.sort((a, b) => {return a - b});
 
-          _.each(array, (x) => {
+          _.each(copyArr, (x) => {
             if(trackerObj.hasOwnProperty(`${iterator(x)}`) === false){
               trackerObj[`${iterator(x)}`] = x;
             }
           });
         }
         //return the unique values from the trackerObj in an array (JP)
+        console.log(array);
         return Object.values(trackerObj);
 
     }else{
@@ -180,16 +182,18 @@
             })
         }else{
           //Sort the Array from lowest to highest (JP)
-          array.sort((a, b) => {return a - b});
+          let copyArr = array.slice(0);
+          copyArr.sort((a, b) => {return a - b});
           //there is no iterator in this case so just go through each elem in the array 
           //and if the result is not already in the uniqueArr push it there (JP)
-           _.each(array, (x) => {
+           _.each(copyArr, (x) => {
             if(!uniqueArr.includes(x)){
               uniqueArr.push(x)
               }
             }) 
           }
         // return the uniqueArr because there is no iterator changing values (JP)
+        console.log(array);
       return uniqueArr
     }  
 
