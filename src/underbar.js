@@ -7,7 +7,9 @@
   // seem very useful, but remember it--if a function needs to provide an
   // iterator when the user does not pass one in, this will be handy.
   _.identity = function(val) {
-  };
+    //simple as already stated it just returns what is passed in (JP)
+    return val
+  };  
 
   /**
    * COLLECTIONS
@@ -31,12 +33,25 @@
   // Return an array of the first n elements of an array. If n is undefined,
   // return just the first element.
   _.first = function(array, n) {
+    //is n undefined ? if yes return first elem if no slice till the n th elem (JP)
     return n === undefined ? array[0] : array.slice(0, n);
   };
 
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
+
+    //returns empty because we arent giving it a number of elems to slice (JP)
+    if (n === 0){
+      return []
+    }
+    //returns last elem of array when undefined simply because the rules say to (JP)
+    if (n === undefined){
+      return array[array.length - 1]
+    }
+
+    //chop off however many from the back of an array by making n negative (JP)
+    return array.slice(- n);    
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -45,6 +60,19 @@
   // Note: _.each does not have a return value, but rather simply runs the
   // iterator function over each item in the input collection.
   _.each = function(collection, iterator) {
+    // Tells me if its an Array (JP)
+    if(Array.isArray(collection)){
+      //loops through the collection and calls iterator() giving me access to the elem, the index, & the collection (JP)
+      for(let i = 0; i < collection.length; i++){
+        iterator(collection[i], i , collection);
+      }
+      //Tells me if its an Object (JP)
+    }else if(typeof collection === 'object'){
+      //loops through the collection and calls iterator() giving me access to the elem, the index, & the collection (JP)
+      for(let key in collection){
+        iterator(collection[key], key, collection);
+      }
+    }
   };
 
   // Returns the index at which value can be found in the array, or -1 if value
@@ -53,29 +81,118 @@
     // TIP: Here's an example of a function that needs to iterate, which we've
     // implemented for you. Instead of using a standard `for` loop, though,
     // it uses the iteration helper `each`, which you will need to write.
+    
+    //Unless changed by _.each() it stays -1 (JP)
     var result = -1;
 
-    _.each(array, function(item, index) {
-      if (item === target && result === -1) {
+    _.each(array, function(item, index, collection) {
+      //if the elem equals the target change the result to the index then return it (JP)
+      if (item === target && result === -1){
         result = index;
       }
     });
-
+    //returns current result (JP)
     return result;
+   
   };
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
+    //creates an array to push passing elems to (JP) 
+    let trueElems = [];
+
+    //for each elem in the collection if the test function returns true 
+    //push that elem to the result Array (JP)
+    _.each(collection, (x) => {
+      if(test(x)){
+        trueElems.push(x);
+      }
+    })
+
+    //returns all elems that passed the test (JP)
+    return trueElems
+      
   };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+
+    //creates an array to push passing elems to (JP) 
+    let falseElems = [];
+
+    //for each elem in the collection if the test function returns false 
+    //push that elem to the result Array (JP)
+    _.filter(collection, (x) => {
+      if(!test(x)){
+        falseElems.push(x);
+      }
+    })
+
+    //returns all elems that failed the test (JP)
+    return falseElems
   };
 
+
   // Produce a duplicate-free version of the array.
-  _.uniq = function(array, isSorted, iterator) {
+  _.uniq = function(array, isSorted, iterator) {  
+    let uniqueArr = [];
+    let trackerObj = {};
+
+    if(iterator){
+        //if there is an iterator check to see if array is sorted (JP)
+        if(isSorted === true){
+        //run the iterator function on each elem in the array 
+        //if the result is not already in the trackerObj put it there 
+        //using the result of the iterator function as the key
+        //and the corresponding element of the array as its value (JP)
+        
+          _.each(array, (x) => {
+
+              if(trackerObj.hasOwnProperty(`${iterator(x)}`) === false){
+                trackerObj[`${iterator(x)}`] = x;
+              }
+          });
+      
+        }else{
+          //Sort the array from lowest to highest (JP)
+          array.sort((a, b) => {return a - b});
+
+          _.each(array, (x) => {
+            if(trackerObj.hasOwnProperty(`${iterator(x)}`) === false){
+              trackerObj[`${iterator(x)}`] = x;
+            }
+          });
+        }
+        //return the unique values from the trackerObj in an array (JP)
+        return Object.values(trackerObj);
+
+    }else{
+    
+        if(isSorted === true){
+          //there is no iterator in this case so just go through each elem in the array 
+          //and if the result is not already in the uniqueArr push it there (JP)
+           _.each(array, (x) => {
+            if(!uniqueArr.includes(x)){
+              uniqueArr.push(x)
+              }
+            })
+        }else{
+          //Sort the Array from lowest to highest (JP)
+          array.sort((a, b) => {return a - b});
+          //there is no iterator in this case so just go through each elem in the array 
+          //and if the result is not already in the uniqueArr push it there (JP)
+           _.each(array, (x) => {
+            if(!uniqueArr.includes(x)){
+              uniqueArr.push(x)
+              }
+            }) 
+          }
+        // return the uniqueArr because there is no iterator changing values (JP)
+      return uniqueArr
+    }  
+
   };
 
 
@@ -84,6 +201,18 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+
+    // creates an array that you can push new values to (JP)
+    let mapArr = [];
+
+    // run the iterator function on each element in the collection and push to the Array (JP)
+    _.each(collection, (elem) => {
+      mapArr.push(iterator(elem));
+    })
+
+    //returns a mapped array (JP)
+    return mapArr;
+
   };
 
   /*
@@ -99,6 +228,8 @@
     // TIP: map is really handy when you want to transform an array of
     // values into a new array of values. _.pluck() is solved for you
     // as an example of this.
+
+    // maps a collection and returns an array of each elems specified key (JP)
     return _.map(collection, function(item){
       return item[key];
     });
@@ -124,8 +255,31 @@
   //     return total + number * number;
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
+
+
+
   _.reduce = function(collection, iterator, accumulator) {
+      
+      // if there is no accumulator.. set it to the first elem in the collection (JP)
+      if (accumulator === undefined) {
+        accumulator = collection[0];
+      //discards first element and leaves me with the rest (JP)
+        collection = collection.slice(1);
+      }
+
+       _.each(collection, function(elem) {
+      //runs the iterator on each elem in the collection (except for the first one ...
+      //...IF the accumulator had to be set to the first elem in the collection) (JP)
+
+      // accumulator is set to the return value of the previous iterator call
+         accumulator = iterator(accumulator, elem);
+      });
+
+    return accumulator;
   };
+
+
+  //STOP HERE
 
   // Determine if the array or object contains a given value (using `===`).
   _.contains = function(collection, target) {
@@ -298,3 +452,11 @@
   _.throttle = function(func, wait) {
   };
 }());
+
+
+
+
+
+
+
+
