@@ -381,7 +381,6 @@
         return obj;
     };
 
-    // _.extend({}, {a: 'four'}, {b:'seven'});
 
     // Like extend, but doesn't ever overwrite a key that already
     // exists in obj
@@ -427,7 +426,10 @@
         return function () {
             if (!alreadyCalled) {
                 // TIP: .apply(this, arguments) is the standard way to pass on all of the
-                // infromation from one function call to another.
+                // information from one function call to another.
+                // what this does here is this... it says that if the function has not been called yet
+                // then it assigns the function the originally passed in arguments and then changes already called to true
+                // so that if the function is called again it can only be called with the same arguments thus returning the same result (JP)  
                 result = func.apply(this, arguments);
                 alreadyCalled = true;
             }
@@ -436,7 +438,10 @@
         };
     };
 
+    // let testing = _.once((x, y) => { return x * y });
 
+    // testing(3,4); 
+    // testing(5,6);
 
     // Memorize an expensive function's results by storing them. You may assume
     // that the function only takes primitives as arguments.
@@ -446,12 +451,32 @@
     // _.memoize should return a function that, when called, will check if it has
     // already computed the result for the given argument and return that value
     // instead if possible.
-    _.memoize = function (func) {};
+
+    _.memoize = function (func) {
+
+      let cachesObj = {};
+
+      return function(){
+
+      let parameters = JSON.stringify(arguments);
+
+      if(cachesObj[parameters]){
+        console.log('got cached value and saved time');
+        console.log(cachesObj);
+        return cachesObj[parameters]
+      }else{
+        let result = func.apply(this, arguments);
+        cachesObj[parameters] = result;
+        return result; 
+        }   
+      }
+    };
+
+    // let multiply = _.memoize((x, y) => { return x * y });
+
+    // multiply(3,4);
 
 
-
-
-    
 
     // Delays a function for the given number of milliseconds, and then calls
     // it with the arguments supplied.
@@ -459,7 +484,14 @@
     // The arguments for the original function are passed after the wait
     // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
     // call someFunction('a', 'b') after 500ms
-    _.delay = function (func, wait) {};
+    _.delay = function (func, wait) {
+      let args = [];
+      for (let i = 2; i < arguments.length; i++){
+        args.push(arguments[i]);
+      }
+      
+      setTimeout(() => {func.apply(this, args)}, wait);
+    };
 
 
     /**
@@ -472,7 +504,10 @@
     // TIP: This function's test suite will ask that you not modify the original
     // input array. For a tip on how to make a copy of an array, see:
     // http://mdn.io/Array.prototype.slice
-    _.shuffle = function (array) {};
+    _.shuffle = function (array) {
+      let copy = array.slice(0);
+      return copy.sort(() => { return Math.random() - .5 })
+    };
 
 
     /**
